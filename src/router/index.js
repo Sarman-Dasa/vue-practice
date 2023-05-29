@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-
+import store from '@/store'
 Vue.use(VueRouter)
 
 const router = new VueRouter({
@@ -22,6 +22,7 @@ const router = new VueRouter({
             active: true,
           },
         ],
+        middleWare: ['superAdmin','humanResource']
       },
     },
     {
@@ -36,12 +37,13 @@ const router = new VueRouter({
             active: true,
           },
         ],
+        middleWare: ['humanResource']
       },
     },
     {
       path: '/login',
       name: 'login',
-      component: () => import('@/views/Login.vue'),
+      component: () => import('@/views/auth/Login.vue'),
       meta: {
         layout: 'full',
       },
@@ -50,6 +52,14 @@ const router = new VueRouter({
       path: '/error-404',
       name: 'error-404',
       component: () => import('@/views/error/Error404.vue'),
+      meta: {
+        layout: 'full',
+      },
+    },
+    {
+      path: 'unauthantication',
+      name: 'unauthantication',
+      component: () => import('@/views/error/UnAuthantication.vue'),
       meta: {
         layout: 'full',
       },
@@ -69,6 +79,27 @@ router.afterEach(() => {
   if (appLoading) {
     appLoading.style.display = 'none'
   }
+})
+
+router.beforeEach((to,from,next) => {
+  let isLoginUser = store.state.app.token;
+  console.log(isLoginUser);
+  if(to.name !='login') {
+    if(isLoginUser) {
+      let currentUser = store.state.app.userData;
+      console.log("Current User::",currentUser.role);
+      if(to.meta && to.meta.middleWare && !to.meta.middleWare.includes(currentUser.role)) {
+        next({name:'unauthantication'});
+      }
+      else {
+       next();
+      }
+    }
+    else {
+      next({name:'login'});
+    }
+  }
+  next();
 })
 
 export default router
