@@ -12,6 +12,8 @@ import './global-components'
 // 3rd party plugins
 import '@/libs/portal-vue'
 import '@/libs/toastification'
+import axios from 'axios'
+import CryptoJS from 'crypto-js'
 
 // BSV Plugin Registration
 Vue.use(ToastPlugin)
@@ -26,8 +28,21 @@ require('@core/scss/core.scss')
 // import assets styles
 require('@/assets/scss/style.scss')
 
+axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 Vue.config.productionTip = false
 
+// decrypt user info
+if(localStorage.getItem('token') && localStorage.getItem('userInfo')) {
+  let token = CryptoJS.AES.decrypt(localStorage.getItem('token'),process.env.VUE_APP_SECRET_KEY);
+  token = token.toString(CryptoJS.enc.Utf8);
+
+  store.commit('app/UPDATE_AUTH_TOKEN',token);
+
+  let userInfo = CryptoJS.AES.decrypt(localStorage.getItem('userInfo'),process.env.VUE_APP_SECRET_KEY);
+  userInfo = JSON.parse(userInfo.toString(CryptoJS.enc.Utf8));
+
+  store.commit('app/UPDATE_AUTH_USER_DATA',userInfo);
+}
 new Vue({
   router,
   store,
