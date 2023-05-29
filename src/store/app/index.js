@@ -5,6 +5,8 @@ export default {
   state: {
     windowWidth: 0,
     shallShowOverlay: false,
+    token:null,
+    userData:null
   },
   getters: {
     currentBreakPoint: state => {
@@ -23,6 +25,13 @@ export default {
     TOGGLE_OVERLAY(state, val) {
       state.shallShowOverlay = val !== undefined ? val : !state.shallShowOverlay
     },
+    UPDATE_AUTH_TOKEN(state, val) {
+        state.token = val;
+    },
+    UPDATE_AUTH_USER_DATA(state, val) {
+      state.userData = val;
+    }
+
   },
   actions: {},
 }
