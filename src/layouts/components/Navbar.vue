@@ -30,9 +30,9 @@
         <template #button-content>
           <div class="d-sm-flex d-none user-nav">
             <p class="user-name font-weight-bolder mb-0">
-              John Doe
+              {{ userFullName }}
             </p>
-            <span class="user-status">Admin</span>
+            <span class="user-status">{{ userRole }}</span>
           </div>
           <b-avatar
             size="40"
@@ -88,7 +88,7 @@
             icon="LogOutIcon"
             class="mr-50"
           />
-          <span>Logout</span>
+          <span @click="logOut">Logout</span>
         </b-dropdown-item>
       </b-nav-item-dropdown>
     </b-navbar-nav>
@@ -100,6 +100,7 @@ import {
   BLink, BNavbarNav, BNavItemDropdown, BDropdownItem, BDropdownDivider, BAvatar,
 } from 'bootstrap-vue'
 import DarkToggler from '@core/layouts/components/app-navbar/components/DarkToggler.vue'
+import axios from 'axios';
 
 export default {
   components: {
@@ -113,11 +114,36 @@ export default {
     // Navbar Components
     DarkToggler,
   },
+  data() {
+    return {
+      userFullName:null,
+      userRole:null,
+    }
+  },
   props: {
     toggleVerticalMenuActive: {
       type: Function,
       default: () => {},
     },
   },
+  methods: {
+   async logOut() {
+      let token = this.$store.state.app.token;
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('userInfo');
+      await axios.get('logout',{
+        headers: {Authorization: `Bearer ${token}`}
+      }).then(() => {
+        this.$router.push({name:'login'});
+      });
+      
+    }
+  },
+  mounted() {
+    let user = this.$store.state.app.userData;
+    this.userFullName = user.first_name + " " + user.last_name;
+    this.userRole = user.role;
+  }
 }
 </script>
