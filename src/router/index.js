@@ -49,6 +49,11 @@ const router = new VueRouter({
       },
     },
     {
+      path: '/employee-list',
+      name: 'employeeList',
+      component: () =>import('@/views/employee/EmployeeList.vue')
+    },
+    {
       path: '/error-404',
       name: 'error-404',
       component: () => import('@/views/error/Error404.vue'),
