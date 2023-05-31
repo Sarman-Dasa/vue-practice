@@ -1,71 +1,96 @@
 <template>
     <div>
-      <b-row>
-        <!-- perPage -->
-        <b-col sm="2" md="4" class="my-1">
-            <b-form-group
-                label="select"
-                label-cols-md="2"
-            >
-            <b-form-select
-            v-model="perPage"
-            :options="pageOptions"
-            sm="2"
-            >
-            </b-form-select>
-        </b-form-group>
-        </b-col>
+        <b-row>
+            <!-- perPage -->
+            <b-col sm="2" md="4" class="my-1">
+                <b-form-group
+                    label="Per Page"
+                    label-cols-md="3"
+                >
+                <b-form-select
+                v-model="perPage"
+                :options="pageOptions"
+                sm="2"
+                >
+                </b-form-select>
+            </b-form-group>
+            </b-col>
 
-        <!-- Search -->
-        <b-col sm="12" md="4" class="my-1">
-            <b-form-group
-                label="Search"
-                label-cols-sm="2"
-                label-for="searchInput"
-            >
+            <!-- Search -->
+            <b-col sm="12" md="4" class="my-1">
+                <b-form-group
+                    label="Search"
+                    label-cols-sm="2"
+                    label-for="searchInput"
+                >
+                    <b-input-group>
+                        <b-form-input 
+                        id="searchInput"
+                        v-model="search"
+                        type="search"
+                        placeholder="Type to Search"/>
+                        <b-input-group-append>
+                            <b-button 
+                                variant="primary"
+                                @click="clearFilter()"
+                            >
+                            clear
+                            </b-button>
+                        </b-input-group-append>
+                    </b-input-group>
+                </b-form-group>
+            </b-col>
+
+            <!-- Date Picker -->
+            <b-col sm="12" md="4" class="my-1">
+                <b-form-group
+                label="Range"
+                label-cols-sm="2">
                 <b-input-group>
-                    <b-form-input 
-                    id="searchInput"
-                    v-model="search"
-                    type="search"
-                    placeholder="Type to Search"/>
+                    <flat-pickr
+                        v-model="rangeDate"
+                        class="form-control"
+                        :config="{ mode: 'range'}"
+                    />
                     <b-input-group-append>
                         <b-button 
-                            variant="primary"
-                            @click="clearFilter()"
+                            :variant="rangeDate ? 'primary': 'secondary'"
+                            @click="dateFilter()"
+                            :disabled="!rangeDate ? true : false"
                         >
-                        clear
+                            Apply
                         </b-button>
                     </b-input-group-append>
-                </b-input-group>
-            </b-form-group>
-        </b-col>
+                    </b-input-group>
+                </b-form-group>
+            </b-col>
+        </b-row>
 
-        <!-- Date Picker -->
-        <b-col sm="12" md="4" class="my-1">
-            <b-form-group
-            label="Range"
-            label-cols-sm="2">
-            <b-input-group>
-                <flat-pickr
-                    v-model="rangeDate"
-                    class="form-control"
-                    :config="{ mode: 'range'}"
-                />
-                <b-input-group-append>
-                    <b-button 
-                        :variant="rangeDate ? 'primary': 'secondary'"
-                        @click="dateFilter()"
-                        :disabled="!rangeDate ? true : false"
-                    >
-                        Apply
-                    </b-button>
-                </b-input-group-append>
-                </b-input-group>
-            </b-form-group>
-        </b-col>
-      </b-row>
         <b-row>
+            <!-- Salary Filter -->
+            <b-col sm="12" md="4" class="my-1">
+            <b-form-group
+                label="Salary Filter"
+                label-cols-md="3">
+
+                <vue-slider 
+                    v-model="salaryFilter" 
+                    :min="minSalary"
+                    :max="maxSalary"
+                    :interval="1000" />
+            </b-form-group>
+            </b-col>
+            <b-col>
+                <b-button 
+                    variant="gradient-primary"
+                    @click="filterSalary()">
+                    Apply
+                 </b-button>
+                </b-col>
+        </b-row>
+
+        <b-row>
+            <!-- Table -->
             <b-col>
                 <b-table
                 :items="items"
@@ -77,7 +102,9 @@
                 </b-table>
             </b-col>
         </b-row>
+
         <b-row>
+            <!-- Pagination -->
             <b-col cols="12">
                 <b-pagination
                     v-model="currentPage"
@@ -89,17 +116,19 @@
                 />
              </b-col>
         </b-row>
-        <b-card class="mt-5">
-            <range-slider
-                class="slider"
-                min="10000"
-                max="60000"
-                step="1000"
-                v-model="sliderValue"
-                >
-            </range-slider>
-        </b-card>
+
+        <fab
+            :position="position"
+            :bg-color="bgColor"
+            :actions="fabActions"
+            @addEmployee="cache"
+            mainIcon="person"
+            iconSize="small" />
+            
+          Add Employee {{ isAddEmployee }}
+        <AddEmployee v-if="isAddEmployee" @changebooleanvalue="isAddEmployee = $event"/>
     </div>
+   
 </template>
 
 <script>
@@ -121,26 +150,32 @@ import {
 import flatPickr from 'vue-flatpickr-component'
 import vSelect from 'vue-select'
 import moment from "moment"
-import RangeSlider from 'vue-range-slider'
-import 'vue-range-slider/dist/vue-range-slider.css'
+import VueSlider from 'vue-slider-component'
+import 'vue-slider-component/theme/antd.css'
+import fab from 'vue-fab'
+import AddEmployee from './AddEmployee.vue';
+import Parent from '../test/Parent.vue';
 export default {
     components: {
-        BRow,
-        BCol,
-        BTable,
-        BCard,
-        BCardText,
-        BPagination,
-        vSelect,
-        BFormSelect,
-        BFormGroup,
-        BFormInput,
-        BInputGroup,
-        BInputGroupAppend,
-        BButton,
-        flatPickr,
-        RangeSlider
-    },
+    BRow,
+    BCol,
+    BTable,
+    BCard,
+    BCardText,
+    BPagination,
+    vSelect,
+    BFormSelect,
+    BFormGroup,
+    BFormInput,
+    BInputGroup,
+    BInputGroupAppend,
+    BButton,
+    flatPickr,
+    VueSlider,
+    fab,
+    AddEmployee,
+    Parent
+},
     data() {
         return {
             items:[],
@@ -163,7 +198,18 @@ export default {
             rangeDate: null,
             startDate:null,
             endDate:null,
-            sliderValue:10
+            salaryFilter: [10000, 60000],
+            minSalary:10000,
+            maxSalary:60000,
+            bgColor: '#778899',
+            position: 'bottom-right',
+            fabActions: [
+                {
+                    name: 'addEmployee',
+                    icon: 'add'
+                },
+            ],
+            isAddEmployee:false
         }
     },
     methods: {
@@ -174,7 +220,9 @@ export default {
                 page:this.currentPage,
                 search:this.search,
                 startDate:this.startDate,
-                endDate:this.endDate
+                endDate:this.endDate,
+                minSalary:this.salaryFilter[0],
+                maxSalary:this.salaryFilter[1]
             }
             await axios.post('employee/list',input,{
                 headers: {Authorization: `Bearer ${token}`}
@@ -189,12 +237,23 @@ export default {
             let date = this.rangeDate.split('to');
             this.startDate = moment(date[0],'YYYY-MM-DD');
             this.endDate = moment(date[1],'YYYY-MM-DD');
+            console.log(this.minSalary,this.maxSalary);
             this.employeeData();
         },
         clearFilter() {
             this.rangeDate = '';
             this.search = '';
-        }
+            this.salaryFilter = [10000,60000];
+            this.startDate ='';
+            this.endDate ='';
+            this.employeeData();
+        },
+        filterSalary() {
+            this.employeeData();
+        },
+        cache(){
+            this.isAddEmployee = true;
+      }
     },
     watch: {
         currentPage() {
@@ -209,8 +268,8 @@ export default {
         rangeDate(value) {
            console.log(value);
         },
-        sliderValue(value) {
-            console.log(value);
+        salaryFilter(value) {
+            console.log(value[0],value[1]);
         }
     },
     mounted() {
