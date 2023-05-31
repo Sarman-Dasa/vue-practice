@@ -27,7 +27,6 @@ require('@core/scss/core.scss')
 
 // import assets styles
 require('@/assets/scss/style.scss')
-
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 Vue.config.productionTip = false
 
@@ -43,6 +42,9 @@ if(localStorage.getItem('token') && localStorage.getItem('userInfo')) {
 
   store.commit('app/UPDATE_AUTH_USER_DATA',userInfo);
 }
+
+export const eventBus = new Vue();
+
 new Vue({
   router,
   store,
