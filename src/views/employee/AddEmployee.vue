@@ -98,6 +98,7 @@ import flatPickr from 'vue-flatpickr-component'
 import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import { required, email } from '@validations'
 import axios from 'axios';
+import { eventBus } from '@/main';
 export default {
     components: {
         BButton,
@@ -153,7 +154,8 @@ export default {
            this.$refs.employeeForm.reset();
         },
         close() {
-            this.$emit("changebooleanvalue", false);
+            //this.$emit("changebooleanvalue", false);
+            eventBus.$emit("changebooleanvalue",false);
         }
     },
     mounted() {

@@ -126,7 +126,7 @@
             iconSize="small" />
             
           Add Employee {{ isAddEmployee }}
-        <AddEmployee v-if="isAddEmployee" @changebooleanvalue="isAddEmployee = $event"/>
+        <AddEmployee v-if="isAddEmployee"/>
     </div>
    
 </template>
@@ -155,6 +155,7 @@ import 'vue-slider-component/theme/antd.css'
 import fab from 'vue-fab'
 import AddEmployee from './AddEmployee.vue';
 import Parent from '../test/Parent.vue';
+import { eventBus } from '@/main';
 export default {
     components: {
     BRow,
@@ -274,6 +275,11 @@ export default {
     },
     mounted() {
         this.employeeData();
+    },
+    created() {
+        eventBus.$on('changebooleanvalue',(data) => {
+            this.isAddEmployee = data;
+        })
     }
 }
 </script>
