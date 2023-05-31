@@ -15,6 +15,9 @@ import '@/libs/toastification'
 import axios from 'axios'
 import CryptoJS from 'crypto-js'
 
+import VueSweetalert2 from 'vue-sweetalert2';
+Vue.use(VueSweetalert2);
+
 // BSV Plugin Registration
 Vue.use(ToastPlugin)
 Vue.use(ModalPlugin)
