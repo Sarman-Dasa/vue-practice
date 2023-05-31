@@ -9,7 +9,7 @@
         header-bg-variant="info"
         body-text-variant="dark"
         ok-variant="success"
-        ok-title="Submit"
+        :ok-title="isEditData ? 'Update' : 'Save'"
         centered
         size="lg"
         cancel-text="clear"
@@ -120,12 +120,15 @@ export default {
             phone:'',
             required,
             email,
-            joniningDate:null
+            joniningDate:null,
+            isEditData:false,
+            editId:null,
         }
     },
     directive: {
         'b-modal': VBModal,
     },
+    props:['employeeData'],
     methods: {
         submit() {
           this.$refs.employeeValidation.validate().then((success) => {
@@ -135,20 +138,31 @@ export default {
           })
         },
         async addEmployee() {
+        
             let token = this.$store.state.app.token;
-           await axios.post('employee/create',{
-            name:this.name,
-            email:this.empEmail,
-            phone:this.phone,
-            joining_date:this.joniningDate,
-            salary:this.salary
-           },{
-            headers: {Authorization: `Bearer ${token}`}
+            let method = axios.post;
+            let url = "employee/create";
+            if (this.isEditData) {
+                method = axios.put;
+                url = `employee/update/${this.editId}`;
+            }
+            alert(this.isEditData);
+            await method(url,{
+                name:this.name,
+                email:this.empEmail,
+                phone:this.phone,
+                joining_date:this.joniningDate,
+                salary:this.salary
+            },{
+                headers: {Authorization: `Bearer ${token}`}
 
-           }).then(() => {
-            this.$refs.addEmployee.hide()
-            this.close();
-           })
+            }).then(() => {
+                this.isEditData = false;
+                this.clear();
+                this.employeeData = '';
+                this.$refs.addEmployee.hide()
+                this.close();
+            })
         },
         clear() {
            this.$refs.employeeForm.reset();
@@ -160,6 +174,16 @@ export default {
     },
     mounted() {
         this.$refs.addEmployee.show();
+        console.log(this.employeeData);
+        if(this.employeeData) {
+            this.name = this.employeeData.name;
+            this.empEmail = this.employeeData.email;
+            this.phone = this.employeeData.phone;
+            this.salary = this.employeeData.salary;
+            this.joniningDate = this.employeeData.joining_date;
+            this.editId = this.employeeData.id;
+            this.isEditData = true;
+        }
     }
 }
 </script>
