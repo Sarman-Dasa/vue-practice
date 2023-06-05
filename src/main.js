@@ -33,7 +33,7 @@ require('@/assets/scss/style.scss')
 axios.defaults.baseURL = process.env.VUE_APP_API_URL;
 Vue.config.productionTip = false
 
-// decrypt user info
+// // decrypt user info
 if(localStorage.getItem('token') && localStorage.getItem('userInfo')) {
   let token = CryptoJS.AES.decrypt(localStorage.getItem('token'),process.env.VUE_APP_SECRET_KEY);
   token = token.toString(CryptoJS.enc.Utf8);
@@ -45,6 +45,21 @@ if(localStorage.getItem('token') && localStorage.getItem('userInfo')) {
 
   store.commit('app/UPDATE_AUTH_USER_DATA',userInfo);
 }
+
+// if(localStorage.getItem('testToken') && localStorage.getItem('testUser')) {
+//     let token = CryptoJS.AES.decrypt(localStorage.getItem('testToken'),process.env.VUE_APP_SECRET_KEY);
+//     token  = token.toString(CryptoJS.enc.Utf8);
+    
+//     store.commit('myState/UPDATE_AUTH_USER_TOKEN',token);
+    
+//     let user  = CryptoJS.AES.decrypt(localStorage.getItem('testUser'),process.env.VUE_APP_SECRET_KEY);
+  
+//     user = JSON.parse(user.toString(CryptoJS.enc.Utf8));
+//     console.log("Main js File code end",user);
+   
+//     store.commit('myState/UPDATE_AUTH_USER_DATA',user);
+// }
+
 
 export const eventBus = new Vue();
 
