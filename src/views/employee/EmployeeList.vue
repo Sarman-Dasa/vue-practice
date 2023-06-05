@@ -82,7 +82,6 @@
         <fab :position="position" :bg-color="bgColor" :actions="fabActions" @addEmployee="openModal()" mainIcon="person"
             iconSize="small" />
 
-        Add Employee {{ isAddEmployee }}
         <AddEmployee v-if="isAddEmployee" :employeeData="employeeDataEdit"/>
     </div>
 </template>
@@ -137,7 +136,7 @@ export default {
         return {
             items: [],
             fields: [
-                { key: 'id', label: 'ID', variant: 'success' },
+                { key: 'id', label: 'ID' },
                 { key: 'name', label: 'NAME' },
                 { key: 'email', label: 'EMAIL' },
                 { key: 'phone', label: 'PHONE' },
@@ -293,6 +292,7 @@ export default {
     created() {
         eventBus.$on('changebooleanvalue', (data) => {
             this.isAddEmployee = data;
+            this.employeeDataEdit = '';
         })
     }
 }
