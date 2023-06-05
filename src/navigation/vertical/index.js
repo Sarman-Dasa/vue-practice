@@ -1,7 +1,6 @@
 import store from "@/store";
 
 let userRole = store.state.app.userData.role;
-console.log("Role::",userRole);
 let menuItem = [
   {
     title: 'Home',
