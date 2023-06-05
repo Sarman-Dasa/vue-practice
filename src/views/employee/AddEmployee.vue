@@ -5,14 +5,13 @@
         id="modal-add-employee"
         ref="addEmployee"
         cancel-variant="danger"
-        cancel-title="Clear"
+        cancel-title="Reset"
         header-bg-variant="info"
         body-text-variant="dark"
         ok-variant="success"
         :ok-title="isEditData ? 'Update' : 'Save'"
         centered
         size="lg"
-        cancel-text="clear"
         @ok.prevent="submit()"
         @cancel.prevent="clear()"
         @close.prevent="close()"
@@ -98,6 +97,7 @@ import flatPickr from 'vue-flatpickr-component'
 import { ValidationObserver, ValidationProvider } from 'vee-validate';
 import { required, email } from '@validations'
 import axios from 'axios';
+import message from '@/mixin/message';
 import { eventBus } from '@/main';
 export default {
     components: {
@@ -128,6 +128,7 @@ export default {
     directive: {
         'b-modal': VBModal,
     },
+    mixins:[message],
     props:['employeeData'],
     methods: {
         submit() {
@@ -146,7 +147,7 @@ export default {
                 method = axios.put;
                 url = `employee/update/${this.editId}`;
             }
-            alert(this.isEditData);
+            //alert(this.isEditData);
             await method(url,{
                 name:this.name,
                 email:this.empEmail,
@@ -160,32 +161,46 @@ export default {
                 this.isEditData = false;
                 this.clear();
                 this.employeeData = '';
-                this.$refs.addEmployee.hide()
+                //this.$refs.addEmployee.hide()
                 this.close();
+            }).catch((error) => {
+                let err = error.response.data.errors;
+
+                Object.values(err).forEach((val) => {
+                    this.toastMessage(val[0]+"🚨",'danger');
+                });
             })
         },
         clear() {
-           this.$refs.employeeForm.reset();
+          if(!this.isEditData) {
+            this.$refs.employeeForm.reset();
+          } else {
+            this.fillUpForm();
+          }
         },
+        //close modal dialog box
         close() {
             //this.$emit("changebooleanvalue", false);
             eventBus.$emit("changebooleanvalue",false);
+        },
+        fillUpForm() {
+            this.$refs.addEmployee.show();
+            if(this.employeeData) {
+                let emp = this.employeeData;
+                this.name = emp.name;
+                this.empEmail = emp.email;
+                this.phone = emp.phone;
+                this.salary = emp.salary;
+                this.joniningDate = emp.joining_date;
+                this.editId = emp.id;
+                this.isEditData = true;
+            }
         }
     },
     mounted() {
-        this.$refs.addEmployee.show();
-        console.log(this.employeeData);
-        if(this.employeeData) {
-            this.name = this.employeeData.name;
-            this.empEmail = this.employeeData.email;
-            this.phone = this.employeeData.phone;
-            this.salary = this.employeeData.salary;
-            this.joniningDate = this.employeeData.joining_date;
-            this.editId = this.employeeData.id;
-            this.isEditData = true;
-        }
+        this.fillUpForm();
     }
-}
+    }
 </script>
 <style lang="scss">
     @import '@core/scss/vue/libs/vue-flatpicker.scss';
