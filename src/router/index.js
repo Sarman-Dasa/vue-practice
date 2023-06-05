@@ -22,7 +22,7 @@ const router = new VueRouter({
             active: true,
           },
         ],
-        middleWare: ['superAdmin','humanResource']
+        middleWare: ['superAdmin','humanResource','Employee']
       },
     },
     {
@@ -37,7 +37,7 @@ const router = new VueRouter({
             active: true,
           },
         ],
-        middleWare: ['humanResource']
+        middleWare: ['humanResource','superAdmin']
       },
     },
     {
@@ -51,7 +51,17 @@ const router = new VueRouter({
     {
       path: '/employee-list',
       name: 'employeeList',
-      component: () =>import('@/views/employee/EmployeeList.vue')
+      component: () =>import('@/views/employee/EmployeeList.vue'),
+     meta: {
+        pageTitle: 'Employee',
+        breadcrumb: [
+          {
+            text: 'List',
+            active: true,
+          }
+        ],
+        middleWare: ['superAdmin','Employee']
+      }
     },
     {
       path: '/error-404',
