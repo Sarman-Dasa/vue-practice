@@ -254,8 +254,8 @@ export default {
         this.toastMessage(success.data.message,'success')
         let token = success.data.data.token;
         let userInfo = success.data.data.user
-        //console.log(userInfo);
         this.loginUserData(token,userInfo);
+        //this.authUserData(token,userInfo);
       }).catch((error) => {
         console.log(error.response)
         //this.toastMessage(error.response.data.message,'danger')
